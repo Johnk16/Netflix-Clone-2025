@@ -1,12 +1,15 @@
 
 import './App.css'
+import Home from './pages/Home'
 
 function App() {
   
 
   return (
     <>
-      <p>Netflix Clone for 2025</p>
+    
+      <Home />
+
     </>
   )
 }
