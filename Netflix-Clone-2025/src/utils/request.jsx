@@ -1,4 +1,4 @@
-const API_KEY = import.meta.env.API_KEY;
+const API_KEY = import.meta.env.VITE_API_KEY;
 const requests = {
   // The ? tells the server that query parameters are being passed in the URL.
   //Everything after the ? is a key-value pair, or multiple pairs separated by &.
