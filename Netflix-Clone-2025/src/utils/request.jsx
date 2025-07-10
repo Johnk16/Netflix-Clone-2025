@@ -2,7 +2,7 @@ const API_KEY = import.meta.env.VITE_API_KEY;
 const requests = {
   // The ? tells the server that query parameters are being passed in the URL.
   //Everything after the ? is a key-value pair, or multiple pairs separated by &.
-  fetchTrending: ` /trending/all/day?api_key=${API_KEY}&language=en-US`,
+  fetchTrending:`/trending/all/day?api_key=${API_KEY}&language=en-US`,
   fetchNetflixOriginals: `/discover/tv?api_key=${API_KEY}&with_networks=213`,
   fetchTopRatedMovies: `/movie/top_rated?api_key=${API_KEY}&language=en-US`,
   fetchActionMovies: `/discover/movie?api_key=${API_KEY}&with_genres=28`,
