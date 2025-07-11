@@ -1,38 +1,214 @@
-.row__poster {
-	width: 100%;
-	object-fit: contain;
-	max-height: 100px;
-	transition: transform 450ms;
-	margin-right: 10px;
-}
-.row__posters {
-	display: flex;
-	overflow-y: hidden;
-	overflow-x: scroll;
-	padding: 20px;
-}
-.row__posters::-webkit-scrollbar {
-	display: none;
-}
-.row__poster:hover {
-	transform: scale(1.08);
-}
-.row__posterLarge{
-    max-height: 250px;
-}
-.row__posterLarge:hover{
-    transform: scale(1.09);
-}
-.row{
-    margin-left: 20px;
-	color: white;
-}
-@media only screen and (max-width: 600px) {
-  body {
-    background-color: lightblue;
+/* -------------------- General Styles -------------------- */
 
+.row {
+    margin-left: 20px;
+    color: white;
   }
+  
+  .row__title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  /* -------------------- Poster Container -------------------- */
+  
+  .row__scrollContainer {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+  
   .row__posters {
-	width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px 40px;
+    gap: 20px;
+    overflow-x: hidden;
+    width: 100%;
   }
-}
+  
+  .row__posters::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* -------------------- Poster Wrapper -------------------- */
+  
+  .row__posterWrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    width: 100%;
+  }
+  
+  /* -------------------- Poster Images -------------------- */
+  
+  .row__poster {
+    width: 100%;
+    object-fit: cover;
+    transition: transform 450ms;
+    cursor: pointer;
+  }
+  
+  .row__posterLarge {
+    max-height: 250px;
+  }
+  
+  .row__poster:hover,
+  .row__posterLarge:hover {
+    transform: scale(1.08);
+  }
+  
+  /* -------------------- Index Number -------------------- */
+  
+  .movie__index {
+    position: absolute;
+    top: 40px;
+    left: 1px;
+    font-size: 26px;
+    font-weight: bold;
+    color: white;
+    z-index: 1;
+  }
+  
+  /* -------------------- Arrow Buttons -------------------- */
+  
+  .scrollBtn {
+    position: absolute;
+    top: 40%;
+    background-color: rgba(0, 0, 0, 0.6);
+    border: none;
+    color: white;
+    font-size: 2rem;
+    height: 60px;
+    width: 40px;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+  }
+  
+  .scrollBtn:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+  }
+  
+  .scrollBtn.left {
+    left: 0;
+  }
+  
+  .scrollBtn.right {
+    right: 0;
+  }
+  
+  /* -------------------- Pagination (if needed) -------------------- */
+  
+  .pagination__controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 0 20px 0;
+    gap: 15px;
+  }
+  
+  .pagination__btn {
+    font-size: 16px;
+    padding: 6px 12px;
+    background-color: #e50914;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  
+  .pagination__btn:disabled {
+    background-color: gray;
+    cursor: not-allowed;
+  }
+  
+  .pagination__info {
+    font-size: 16px;
+    color: white;
+  }
+  
+  /* -------------------- Responsive Layout -------------------- */
+  
+  /* Desktop: 10 movies */
+  @media only screen and (min-width: 1025px) {
+    .row__posterWrapper {
+      max-width: calc((100% - 9 * 20px) / 10);
+    }
+  
+    .row__poster {
+      max-height: 100px;
+    }
+  
+    .movie__index {
+      font-size: 26px;
+    }
+  }
+  
+  /* Tablet: 5 movies */
+  @media only screen and (max-width: 1024px) and (min-width: 601px) {
+    .row__posterWrapper {
+      max-width: calc((100% - 4 * 20px) / 5);
+    }
+  
+    .row__poster {
+      max-height: 80px;
+    }
+  
+    .row__posterLarge {
+      max-height: 180px;
+    }
+  
+    .movie__index {
+      font-size: 20px;
+      bottom: 8px;
+      left: 8px;
+    }
+  }
+  
+  /* Mobile: 3 movies */
+  @media only screen and (max-width: 600px) {
+    .row {
+      margin-left: 0;
+      padding: 0 10px;
+    }
+  
+    .row__title {
+      font-size: 20px;
+      text-align: center;
+    }
+  
+    .row__posterWrapper {
+      max-width: calc((100% - 2 * 20px) / 3);
+    }
+  
+    .row__poster {
+      max-height: 60px;
+    }
+  
+    .row__posterLarge {
+      max-height: 120px;
+    }
+  
+    .movie__index {
+      font-size: 16px;
+      bottom: 6px;
+      left: 6px;
+    }
+  
+    .scrollBtn {
+      width: 30px;
+      height: 50px;
+      font-size: 1.5rem;
+      top: 35%;
+    }
+  }
+  

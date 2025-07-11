@@ -1,68 +1,66 @@
-// React imports: useState for managing state, useEffect for running code on mount or when dependencies change
 import React, { useEffect, useState } from "react";
+// Import React and hooks for state and side effects
 
-// Importing CSS specific to this component
 import "./Row.css";
+// Import CSS styles for the component
 
-// Axios instance for making API calls (likely pre-configured with base URL)
 import axios from "../../../utils/axios";
+// Import custom Axios instance to make API requests
 
-// External packages:
-// movie-trailer: searches for movie trailers on YouTube
-// react-youtube: used to embed YouTube videos in the component
 import movieTrailer from "movie-trailer";
+// Library to fetch a YouTube trailer URL for a given movie name
+
 import YouTube from "react-youtube";
+// React component to embed YouTube videos
 
-// Main Row component: receives props from parent (title, fetchUrl, isLargeRow)
+// Define the Row component with props: title, fetchUrl, isLargeRow
 const Row = ({ title, fetchUrl, isLargeRow }) => {
-  // State to store list of movies from API
-  const [movies, setMovie] = useState([]);
+  const [movies, setMovie] = useState([]); // List of movies from API
+  const [trailerUrl, setTrailerUrl] = useState(""); // YouTube trailer video ID
+  const [startIndex, setStartIndex] = useState(0); // Start index for movie display
+  const [visibleCount, setVisibleCount] = useState(10); // Number of visible movies
 
-  // State to store the YouTube trailer video ID
-  const [trailerUrl, setTrailerUrl] = useState("");
+  const base_url = "https://image.tmdb.org/t/p/original"; // Base URL for images
 
-  // Base URL to construct full image paths
-  const base_url = "https://image.tmdb.org/t/p/original";
-
-  // useEffect runs when component mounts or when fetchUrl changes
+  // Adjust number of visible movies based on screen size
   useEffect(() => {
-    console.log("fetchUrl for:", title, "=>", fetchUrl);
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width <= 600) {
+        setVisibleCount(3); // Show 3 movies on small screens
+      } else if (width <= 1024) {
+        setVisibleCount(5); // Show 5 movies on tablets
+      } else {
+        setVisibleCount(10); // Show 10 movies on desktops
+      }
+    };
 
-    // Immediately invoked async function to fetch data
+    handleResize(); // Run once on initial render
+    window.addEventListener("resize", handleResize); // Listen for window resize
+    return () => window.removeEventListener("resize", handleResize); // Cleanup
+  }, []);
+
+  // Fetch movies from the API when the component mounts or fetchUrl changes
+  useEffect(() => {
     (async () => {
       try {
-        // Fetch movie list from API endpoint
-        const request = await axios.get(fetchUrl);
-        console.log(request);
-
-        // Set movie state using results from API
-        setMovie(request.data.results);
+        const request = await axios.get(fetchUrl); // Make API call
+        setMovie(request.data.results); // Set response results to state
       } catch (error) {
-        // Log any fetch errors
-        console.log("error", error);
+        console.log("error", error); // Log error if request fails
       }
     })();
-  }, [fetchUrl]); // Dependency: re-run if fetchUrl prop changes
+  }, [fetchUrl]);
 
-  // Handle click on a movie poster
+  // Handle click on a movie to toggle trailer
   const handleClick = (movie) => {
-    // If a trailer is already playing, clicking again will hide it
     if (trailerUrl) {
-      setTrailerUrl("");
+      setTrailerUrl(""); // If a trailer is playing, hide it
     } else {
-      // Search for trailer on YouTube using movie title/name/original_name
       movieTrailer(movie?.title || movie?.name || movie?.original_name).then(
         (url) => {
-          console.log("this is url", url);
-
-          // Extract URL query parameters from returned YouTube URL
           const urlParams = new URLSearchParams(new URL(url).search);
-
-          console.log(" this is urlParams", urlParams);
-          console.log("this is video Id", urlParams.get("v"));
-
-          // Set the trailerUrl with the video ID to embed YouTube player
-          setTrailerUrl(urlParams.get("v"));
+          setTrailerUrl(urlParams.get("v")); // Extract YouTube video ID
         }
       );
     }
@@ -72,34 +70,59 @@ const Row = ({ title, fetchUrl, isLargeRow }) => {
   const opts = {
     height: "390",
     width: "100%",
-    playerVars: {
-      autoplay: 1, // auto-play video on load
-    },
+    playerVars: { autoplay: 1 }, // Auto-play the trailer
   };
 
-  // Render component
+  // Slice the movie list to show only the visible portion
+  const visibleMovies = movies.slice(startIndex, startIndex + visibleCount);
+
   return (
     <div className="row">
-      {/* Section title */}
-      <h1>{title}</h1>
+      <h1 className="row__title">{title}</h1> {/* Section title */}
+      <div className="row__scrollContainer">
+        {/* Left arrow button for scrolling left */}
+        <button
+          className="scrollBtn left"
+          onClick={() => setStartIndex((prev) => Math.max(prev - 1, 0))}
+          disabled={startIndex === 0}
+        >
+          ‹
+        </button>
 
-      {/* Container for movie posters */}
-      <div className="row__posters">
-        {movies?.map((movie, index) => (
-          <img
-            // When clicked, attempt to show/hide trailer
-            onClick={() => handleClick(movie)}
-            key={index} // Use index as a fallback key (not ideal in dynamic lists)
-            src={`${base_url}${
-              isLargeRow ? movie.poster_path : movie.backdrop_path
-            }`} // Use different image type depending on row size
-            alt={movie.name}
-            className={`row__poster ${isLargeRow && "row__posterLarge"}`} // Conditional class
-          />
-        ))}
+        {/* Container for movie posters */}
+        <div className="row__posters">
+          {visibleMovies.map((movie, index) => (
+            <div className="row__posterWrapper" key={index}>
+              {/* Display movie index number */}
+              <span className="movie__index">{startIndex + index + 1}</span>
+
+              {/* Display poster image */}
+              <img
+                onClick={() => handleClick(movie)} // Toggle trailer on click
+                src={`${base_url}${
+                  isLargeRow ? movie.poster_path : movie.backdrop_path
+                }`}
+                alt={movie.name}
+                className={`row__poster ${isLargeRow && "row__posterLarge"}`}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Right arrow button for scrolling right */}
+        <button
+          className="scrollBtn right"
+          onClick={() =>
+            setStartIndex((prev) =>
+              Math.min(prev + 1, movies.length - visibleCount)
+            )
+          }
+          disabled={startIndex >= movies.length - visibleCount}
+        >
+          ›
+        </button>
       </div>
-
-      {/* Show YouTube player only if trailerUrl is set */}
+      {/* Render YouTube trailer if available */}
       <div style={{ padding: "2px" }}>
         {trailerUrl && <YouTube videoId={trailerUrl} opts={opts} />}
       </div>
@@ -107,5 +130,5 @@ const Row = ({ title, fetchUrl, isLargeRow }) => {
   );
 };
 
-// Export the component for use in other parts of the app
 export default Row;
+// Export the component for use in other parts of the app
